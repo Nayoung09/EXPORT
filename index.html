@@ -3,81 +3,127 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>바우처 서비스 추천</title>
+<title>바우처 매치</title>
 <meta name="description" content="참가신청서 정보로 수출 지원 바우처 서비스 유형과 이유를 추천하는 과제용 화면 목업">
 <link rel="preload" href="assets/fonts/PretendardVariable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-<header class="topbar">
+<header class="nav">
   <div class="container">
-    <div class="brand">
-      <span class="tag">기획 과제 목업, 가상 기업 데이터</span>
-      <h1>우리 회사에 맞는 바우처 서비스</h1>
-      <p>참가신청서에 이미 입력한 정보로 필요한 서비스 유형과 그 이유를 보여줍니다.</p>
-    </div>
-    <div class="switcher">
-      <span class="label">적용 사례</span>
-      <div class="case-tabs" id="caseTabs" role="tablist" aria-label="기획안 적용 사례 기업"></div>
-      <label class="label" for="company">전체 60개 기업</label>
-      <select id="company"></select>
+    <a class="logo" href="#" data-act="home" aria-label="바우처 매치 홈">
+      <span class="logo-mark"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>바우처 매치
+    </a>
+    <ul class="menu" aria-label="주 메뉴">
+      <li><a href="#" aria-current="page" data-act="menu-active">맞춤 추천</a></li>
+      <li><a href="#" data-act="menu-soon">서비스 찾기</a></li>
+      <li><a href="#" data-act="menu-soon">이용 계획</a></li>
+      <li><a href="#" data-act="menu-soon">진행 현황</a></li>
+    </ul>
+    <div class="nav-right">
+      <button type="button" class="switch" id="evalToggle" role="switch" aria-checked="false">
+        <span class="track" aria-hidden="true"></span><span>평가자 보기</span>
+      </button>
+      <button type="button" class="icon-btn" data-act="menu-soon" aria-label="알림">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16v-5a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg>
+      </button>
+      <div class="profile-chip"><span class="avatar" aria-hidden="true">CO</span><span class="who" id="navWho"></span></div>
     </div>
   </div>
 </header>
 
-<div class="container">
+<div class="container page">
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="hero-top">
+      <div>
+        <h1 id="heroTitle"></h1>
+        <p class="lead">참가신청서와 통관 기록으로 계산했어요. 다시 입력할 필요 없어요</p>
+      </div>
+      <div class="hero-side">
+        <div class="counts" id="counts" aria-live="polite"></div>
+        <button type="button" class="btn" data-act="guide">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.6v.4"/></svg>추천 기준 안내
+        </button>
+      </div>
+    </div>
+    <ol class="ladder" id="ladder" aria-label="성장단계"></ol>
+  </section>
+
+  <div class="alerts" id="alerts"></div>
+
   <div class="layout">
-    <aside class="side" aria-label="신청서 정보와 확인 질문">
-      <section class="panel" aria-labelledby="h-facts">
-        <div class="panel-head"><h2 id="h-facts">신청서에서 가져온 정보</h2><button type="button" class="btn ghost" id="reset">처음 상태로</button></div>
-        <dl class="facts" id="facts"></dl>
-        <p class="hint">숫자 표시는 참가신청서 항목 번호, "시스템"은 선정 시 부여값과 관세청 연계값입니다.</p>
-      </section>
-      <section class="panel" aria-labelledby="h-country">
-        <div class="panel-head"><h2 id="h-country">진출희망국<span class="src">20</span></h2></div>
-        <div class="chips" id="countries"></div>
-        <div class="add-row">
-          <select id="addCountry" aria-label="추가할 국가"></select>
-          <button type="button" class="btn" id="addBtn">추가</button>
-        </div>
-        <p class="hint">현재 수출국에 없는 국가는 신규 진출국으로 표시합니다.</p>
-      </section>
-      <section class="panel" aria-labelledby="h-q">
-        <div class="panel-head"><h2 id="h-q">추천을 정확하게 하는 질문</h2></div>
-        <div id="questions"></div>
-      </section>
+    <aside class="side" aria-label="회사 정보와 확인 질문">
+      <section class="card profile" id="profile" aria-label="회사 프로필"></section>
+      <section class="card qcard" id="questions" aria-labelledby="qTitle"></section>
     </aside>
 
-    <main class="main">
-      <section class="summary" id="summary" aria-live="polite"></section>
-      <div id="alerts" class="list"></div>
-
-      <section aria-labelledby="h-rec" class="list">
-        <div class="section-head"><h2 id="h-rec">추천 서비스 유형</h2><span class="hint">필수, 단계 핵심, 실무 지원 순으로 정렬</span></div>
-        <div class="cards" id="cards"></div>
+    <main class="main" id="main">
+      <section class="section" aria-labelledby="recTitle">
+        <div class="section-head"><h2 id="recTitle">추천 서비스 유형</h2><span class="hint">꼭 필요한 것부터, 지금 단계에 필요한 순서로 보여드려요</span></div>
+        <div class="rec-list" id="recs"></div>
       </section>
 
-      <details class="more" open>
-        <summary>확인하면 추천에 포함될 수 있는 유형 <span class="hint" id="checkCount"></span></summary>
-        <div class="list" id="check"></div>
+      <section class="section" id="checkSec" aria-labelledby="checkTitle">
+        <div class="section-head"><h2 id="checkTitle">확인하면 추천에 포함될 수 있는 유형</h2><span class="hint" id="checkHint"></span></div>
+        <div class="check-grid" id="checks"></div>
+      </section>
+
+      <details class="more section" id="moreSec">
+        <summary><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>더 보기 <span class="hint" id="moreHint"></span></summary>
+        <div class="mini-grid" id="more"></div>
       </details>
 
-      <details class="more">
-        <summary>더 보기 <span class="hint" id="moreCount"></span></summary>
-        <div class="list" id="more"></div>
-      </details>
+      <section class="section" id="hiddenSec" aria-labelledby="hiddenTitle" hidden>
+        <div class="section-head"><h2 id="hiddenTitle">보유 중으로 표시한 유형</h2><span class="hint">다시 추천에 넣으려면 ↺를 누르세요</span></div>
+        <div class="hidden-types" id="hiddenTypes"></div>
+      </section>
 
-      <div id="hiddenWrap" class="list" hidden>
-        <div class="section-head"><h2>숨긴 유형</h2><span class="hint">↺를 누르면 다시 추천에 포함합니다</span></div>
-        <div class="chips" id="hidden"></div>
-      </div>
-
-      <footer class="footer">
-        <p><strong>추천 순서</strong>필수(누락하면 수출이 막힘), 단계 핵심(현재 성장단계에서 다음 단계에 필요), 실무 지원 순입니다. 같은 등급 안에서는 신청서 신호마다 가산점을 더합니다.</p>
-        <p><strong>서비스 정렬</strong>신규 진출국 일치, 진출희망국 일치, 국가 무관 순입니다. 같은 순위에서는 필요 인증명과 품목이 맞는 서비스를 먼저 보여주고, 그 안에서는 무작위입니다. 가격은 순위에 반영하지 않습니다.</p>
-        <p><strong>데이터</strong>기업은 과제 자료 D의 가상 기업 60개, 서비스는 메뉴판 샘플 300건입니다. 국가별 인증표와 FTA 체결국은 기획안에 적은 가정입니다.</p>
-      </footer>
+      <footer class="logic-footer eval-only" id="logicFooter"></footer>
     </main>
+  </div>
+</div>
+
+<button type="button" class="fab" data-act="demo">
+  <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>시연 패널
+</button>
+
+<div class="cart" id="cart" aria-live="polite">
+  <div class="container">
+    <span class="cart-title" id="cartTitle"></span>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-actions">
+      <button type="button" class="btn" data-act="noop">비교하기</button>
+      <button type="button" class="btn primary" data-act="noop">이용 계획에 추가</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="drawer" id="demoDrawer" role="dialog" aria-modal="true" aria-labelledby="demoTitle" hidden>
+  <div class="drawer-head">
+    <h2 id="demoTitle">시연 패널</h2>
+    <button type="button" class="icon-btn" data-act="close" aria-label="닫기"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="drawer-body" id="demoBody"></div>
+</aside>
+
+<aside class="drawer" id="detailDrawer" role="dialog" aria-modal="true" aria-labelledby="detailTitle" hidden>
+  <div class="drawer-head">
+    <h2 id="detailTitle">서비스 상세</h2>
+    <button type="button" class="icon-btn" data-act="close" aria-label="닫기"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="drawer-body" id="detailBody"></div>
+  <div class="drawer-foot" id="detailFoot"></div>
+</aside>
+
+<div class="modal" id="guideModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle" hidden>
+  <div class="modal-box">
+    <div class="drawer-head" style="padding:0;border:0">
+      <h2 id="guideTitle">추천 기준 안내</h2>
+      <button type="button" class="icon-btn" data-act="close" aria-label="닫기"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <ul class="guide" id="guideBody"></ul>
   </div>
 </div>
 
